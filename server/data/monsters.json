@@ -1,0 +1,42 @@
+[
+  {
+    "id": "goblin_grunt",
+    "name": "Goblin Grunt",
+    "hp": 50,
+    "speed": 1.2,
+    "goldValue": 5,
+    "type": "ground"
+  },
+  {
+    "id": "orc_berserker",
+    "name": "Orc Berserker",
+    "hp": 150,
+    "speed": 0.8,
+    "goldValue": 15,
+    "type": "ground"
+  },
+  {
+    "id": "flying_imp",
+    "name": "Flying Imp",
+    "hp": 40,
+    "speed": 1.5,
+    "goldValue": 8,
+    "type": "air"
+  },
+  {
+    "id": "stone_golem",
+    "name": "Stone Golem",
+    "hp": 400,
+    "speed": 0.5,
+    "goldValue": 25,
+    "type": "ground"
+  },
+  {
+    "id": "shadow_wolf",
+    "name": "Shadow Wolf",
+    "hp": 80,
+    "speed": 2.5,
+    "goldValue": 12,
+    "type": "ground"
+  }
+]

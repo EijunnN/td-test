@@ -1,0 +1,74 @@
+{
+  "id": "canyon_of_echoes",
+  "name": "Cañón de los Ecos",
+  "maxPlayers": 2,
+  "initialLives": 20,
+  "initialGold": 400,
+  "waves": [
+    {
+      "wave": 1,
+      "monsters": [{ "typeId": "goblin_grunt", "count": 20, "delay": 0.5 }]
+    },
+    {
+      "wave": 2,
+      "monsters": [
+        { "typeId": "goblin_grunt", "count": 25, "delay": 0.4 },
+        { "typeId": "shadow_wolf", "count": 8, "delay": 1.5 }
+      ]
+    },
+    {
+      "wave": 3,
+      "monsters": [
+        { "typeId": "orc_berserker", "count": 15, "delay": 1.0 },
+        { "typeId": "flying_imp", "count": 12, "delay": 0.8 }
+      ]
+    },
+    {
+      "wave": 4,
+      "monsters": [
+        { "typeId": "shadow_wolf", "count": 20, "delay": 0.5 },
+        { "typeId": "stone_golem", "count": 6, "delay": 3.0 }
+      ]
+    },
+    {
+      "wave": 5,
+      "monsters": [
+        { "typeId": "stone_golem", "count": 8, "delay": 2.5 },
+        { "typeId": "orc_berserker", "count": 15, "delay": 1.0 },
+        { "typeId": "flying_imp", "count": 20, "delay": 0.6 }
+      ]
+    }
+  ],
+  "buildableArea": [
+    { "x": 0, "y": 0, "width": 1000, "height": 70 },
+    { "x": 0, "y": 130, "width": 120, "height": 440 },
+    { "x": 180, "y": 130, "width": 640, "height": 190 },
+    { "x": 180, "y": 380, "width": 640, "height": 190 },
+    { "x": 880, "y": 130, "width": 120, "height": 440 },
+    { "x": 0, "y": 630, "width": 1000, "height": 70 }
+  ],
+  "paths": [
+    {
+      "id": "path_top",
+      "portal": { "x": 0, "y": 100 },
+      "waypoints": [
+        { "x": 450, "y": 100 },
+        { "x": 450, "y": 300 },
+        { "x": 800, "y": 300 },
+        { "x": 800, "y": 100 },
+        { "x": 1000, "y": 100 }
+      ]
+    },
+    {
+      "id": "path_bottom",
+      "portal": { "x": 0, "y": 600 },
+      "waypoints": [
+        { "x": 450, "y": 600 },
+        { "x": 450, "y": 400 },
+        { "x": 800, "y": 400 },
+        { "x": 800, "y": 600 },
+        { "x": 1000, "y": 600 }
+      ]
+    }
+  ]
+}
