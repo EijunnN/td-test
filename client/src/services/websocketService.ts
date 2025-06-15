@@ -1,4 +1,4 @@
-import { EventEmitter } from "events";
+import EventEmitter from "events";
 import type {
   C2S_Event,
   C2S_Payload,
@@ -57,15 +57,20 @@ class WebSocketService {
   }
 
   public disconnect(): void {
-    this.ws?.close();
+    if (this.ws) {
+      this.ws.close();
+    }
   }
 
-  public send<T extends C2S_Event>(type: T, payload: C2S_Payload<T>): void {
+  public send<T extends C2S_Event>(event: T, payload: C2S_Payload<T>) {
     if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      const message = JSON.stringify({ type, payload });
-      this.ws.send(message);
+      this.ws.send(JSON.stringify({ type: event, payload }));
     } else {
-      console.error("WebSocket not connected. Cannot send message.");
+      console.warn(
+        "WebSocket not connected. Message not sent:",
+        event,
+        payload
+      );
     }
   }
 
