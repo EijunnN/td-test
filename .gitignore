@@ -1,0 +1,31 @@
+# Dependencias
+node_modules/
+
+# Archivos de entorno
+.env
+.env.*
+!.env.example
+
+# Logs
+logs
+*.log
+
+# Caches de herramientas y builds
+.cache
+.eslintcache
+*.tsbuildinfo
+dist/
+out/
+
+# Directorios de frameworks de frontend
+.next/
+build/
+
+# IDEs y SO
+.idea/
+.vscode/
+.DS_Store
+
+# Archivos de Bun
+*.tgz
+bun.lockb 
