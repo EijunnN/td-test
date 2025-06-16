@@ -23,7 +23,6 @@ import {
   Castle,
   Warehouse,
 } from "lucide-react";
-import type { TowerDefinition } from "@shared/types/entities";
 
 // Mapeo de IDs de torre a iconos para una mejor visualización
 const towerIcons: { [key: string]: React.ReactNode } = {
@@ -93,8 +92,13 @@ export function TowerShop() {
                     }
                   `}
                 >
-                  <div className="flex justify-between items-start">
-                    <h3 className="text-xl font-bold mb-2">{tower.name}</h3>
+                  <div className="flex justify-between items-center mb-2">
+                    <div className="flex items-center gap-3">
+                      {towerIcons[tower.id] || (
+                        <Warehouse className="h-8 w-8 text-gray-400" />
+                      )}
+                      <h3 className="text-xl font-bold">{tower.name}</h3>
+                    </div>
                     <div className="flex items-center gap-2 text-yellow-400 font-bold">
                       <Coins className="h-5 w-5" />
                       <span>{level1.cost}</span>

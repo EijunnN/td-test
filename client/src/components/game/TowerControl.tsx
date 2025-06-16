@@ -27,6 +27,11 @@ export function TowerControl() {
     (l) => l.level === selectedTower.level + 1
   );
 
+  if (!currentLevelData) {
+    // No debería ocurrir si los datos son correctos
+    return null;
+  }
+
   const handleUpgrade = () => {
     if (!selectedTowerId) return;
     websocketService.send("upgrade_tower", {
@@ -42,17 +47,42 @@ export function TowerControl() {
 
   return (
     <div className="h-full w-full flex items-center justify-between p-2 gap-4 animate-fade-in">
-      {/* Tower Info */}
-      <div className="flex items-center gap-3 text-white">
+      {/* Tower Info & Stats */}
+      <div className="flex items-center gap-4 text-white">
         <Info className="h-8 w-8 text-blue-400 flex-shrink-0" />
         <div>
           <h3 className="font-bold text-lg leading-tight">
-            {towerDefinition.name}
+            {towerDefinition.name}{" "}
+            <span className="text-base font-normal text-gray-300">
+              (Nivel {selectedTower.level})
+            </span>
           </h3>
-          <p className="text-sm text-gray-300 leading-tight">
-            Nivel: {selectedTower.level}
-            {nextLevelData ? ` -> ${selectedTower.level + 1}` : " (Max)"}
-          </p>
+          <div className="flex gap-x-4 gap-y-1 text-sm text-gray-300 mt-1 flex-wrap">
+            <span>
+              Daño: {currentLevelData.damage}{" "}
+              {nextLevelData && (
+                <span className="text-green-400 font-semibold">
+                  → {nextLevelData.damage}
+                </span>
+              )}
+            </span>
+            <span>
+              Rango: {currentLevelData.range}{" "}
+              {nextLevelData && (
+                <span className="text-green-400 font-semibold">
+                  → {nextLevelData.range}
+                </span>
+              )}
+            </span>
+            <span>
+              Velocidad: {currentLevelData.attackSpeed}{" "}
+              {nextLevelData && (
+                <span className="text-green-400 font-semibold">
+                  → {nextLevelData.attackSpeed}
+                </span>
+              )}
+            </span>
+          </div>
         </div>
       </div>
 

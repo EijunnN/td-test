@@ -603,7 +603,11 @@ export class GameSession {
 
     this.broadcast({
       type: "chat_message_received",
-      payload: { fromPlayer: sender.nick, message: trimmedMessage },
+      payload: {
+        fromPlayer: sender.nick,
+        message: trimmedMessage,
+        timestamp: Date.now(),
+      },
     });
   }
 

@@ -64,6 +64,7 @@ export interface S2C_GameOverPayload {
 export interface S2C_ChatMessageReceivedPayload {
   fromPlayer: string; // Nick del jugador
   message: string;
+  timestamp: number;
 }
 
 export interface S2C_ErrorMessagePayload {

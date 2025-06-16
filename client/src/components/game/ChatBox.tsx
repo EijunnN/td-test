@@ -16,7 +16,7 @@ import { websocketService } from "@/services/websocketService";
 
 export function ChatBox() {
   const [isOpen, setIsOpen] = useState(false);
-  const { chatMessages, playerId } = useGameStore();
+  const { chatMessages } = useGameStore();
   const playerNick = useGameStore(
     (s) => s.gameState?.players.find((p) => p.id === s.playerId)?.nick
   );
