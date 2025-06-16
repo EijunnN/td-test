@@ -4,6 +4,7 @@ import { useGameStore } from "@/state/gameStore";
 import { websocketService } from "@/services/websocketService";
 import GameCanvas from "./GameCanvas";
 import { useEffect, useState } from "react";
+import type { GameState } from "@shared/types/GameState";
 import type {
   S2C_GameOverPayload,
   S2C_TowerPlacedPayload,
@@ -23,10 +24,15 @@ const GameView = () => {
     handleTowerPlaced,
     handlePlayerStateUpdate,
     setGameOver,
+    setGameState,
   } = useGameStore();
   const [systemMessages, setSystemMessages] = useState<string[]>([]);
 
   useEffect(() => {
+    const handleGameStateUpdate = (payload: GameState) => {
+      setGameState(payload);
+    };
+
     const handleSystemMessage = (payload: { message: string }) => {
       setSystemMessages((prev) => [...prev, payload.message]);
     };
@@ -50,6 +56,7 @@ const GameView = () => {
       setSystemMessages((prev) => [...prev, `Error: ${payload.message}`]);
     };
 
+    websocketService.on("game_state_update", handleGameStateUpdate);
     websocketService.on("system_message", handleSystemMessage);
     websocketService.on("game_started", handleGameStarted);
     websocketService.on("game_over", handleGameOver);
@@ -58,6 +65,7 @@ const GameView = () => {
     websocketService.on("error_message", handleError);
 
     return () => {
+      websocketService.off("game_state_update", handleGameStateUpdate);
       websocketService.off("system_message", handleSystemMessage);
       websocketService.off("game_started", handleGameStarted);
       websocketService.off("game_over", handleGameOver);
@@ -65,7 +73,7 @@ const GameView = () => {
       websocketService.off("player_state_update", handlePlayerUpdate);
       websocketService.off("error_message", handleError);
     };
-  }, [handlePlayerStateUpdate, handleTowerPlaced, setGameOver]);
+  }, [handlePlayerStateUpdate, handleTowerPlaced, setGameOver, setGameState]);
 
   const handleStartGame = () => {
     websocketService.send("start_game", {});

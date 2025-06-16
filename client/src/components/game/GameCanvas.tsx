@@ -363,13 +363,15 @@ const GameCanvas = () => {
     setPanStart({ x: pos.x - offset.x, y: pos.y - offset.y });
   };
 
-  const handlePanMove = (e: React.MouseEvent | React.TouchEvent) => {
-    if (!isPanning) return;
-    panMoved.current = true;
+  const handleMouseMove = (e: React.MouseEvent | React.TouchEvent) => {
     const pos = getPosOnCanvas(e);
     setMousePos(pos);
-    const newOffset = { x: pos.x - panStart.x, y: pos.y - panStart.y };
-    setOffset(newOffset);
+
+    if (isPanning) {
+      panMoved.current = true;
+      const newOffset = { x: pos.x - panStart.x, y: pos.y - panStart.y };
+      setOffset(newOffset);
+    }
   };
 
   const handlePanEnd = () => setIsPanning(false);
@@ -417,11 +419,11 @@ const GameCanvas = () => {
       <canvas
         ref={canvasRef}
         onMouseDown={handlePanStart}
-        onMouseMove={handlePanMove}
+        onMouseMove={handleMouseMove}
         onMouseUp={handlePanEnd}
         onMouseLeave={handlePanEnd}
         onTouchStart={handlePanStart}
-        onTouchMove={handlePanMove}
+        onTouchMove={handleMouseMove}
         onTouchEnd={handlePanEnd}
         onClick={handleCanvasClick}
         className="absolute top-0 left-0 w-full h-full cursor-grab active:cursor-grabbing"
