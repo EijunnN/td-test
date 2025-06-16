@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useGameStore } from "@/state/gameStore";
-import { DollarSign, ChevronsUp, Trash2 } from "lucide-react";
+import { DollarSign, ChevronsUp, Trash2, X, Info } from "lucide-react";
 import { websocketService } from "@/services/websocketService";
 
 export function TowerControl() {
-  const { gameState, selectedTowerId, selectTower, playerId } = useGameStore();
+  const { gameState, selectedTowerId, selectTower, playerId, towerToBuild } =
+    useGameStore();
 
   const selectedTower = gameState?.towers.find(
     (t) => t.instanceId === selectedTowerId
@@ -15,13 +15,16 @@ export function TowerControl() {
   );
   const player = gameState?.players.find((p) => p.id === playerId);
 
-  if (!selectedTower || !towerDefinition || !player) {
+  // No mostrar nada si no hay torre seleccionada, o si estamos en modo construcción
+  if (!selectedTower || !towerDefinition || !player || towerToBuild) {
     return null;
   }
 
-  const nextLevel = selectedTower.level + 1;
+  const currentLevelData = towerDefinition.levels.find(
+    (l) => l.level === selectedTower.level
+  );
   const nextLevelData = towerDefinition.levels.find(
-    (l) => l.level === nextLevel
+    (l) => l.level === selectedTower.level + 1
   );
 
   const handleUpgrade = () => {
@@ -29,79 +32,67 @@ export function TowerControl() {
     websocketService.send("upgrade_tower", {
       towerInstanceId: selectedTowerId,
     });
-    // Optimistic UI update could be tricky, let's wait for server confirmation
   };
 
   const handleSell = () => {
     if (!selectedTowerId) return;
-    const sellValue = Math.floor(
-      towerDefinition.levels
-        .slice(0, selectedTower.level)
-        .reduce((sum, l) => sum + l.cost, 0) * 0.75
-    );
-
-    if (
-      confirm(
-        `¿Vender la torre por ${sellValue} de oro? (75% del valor invertido)`
-      )
-    ) {
-      websocketService.send("sell_tower", { towerInstanceId: selectedTowerId });
-    }
-  };
-
-  const handleClose = () => {
-    selectTower(null);
+    websocketService.send("sell_tower", { towerInstanceId: selectedTowerId });
+    selectTower(null); // Optimistic deselection
   };
 
   return (
-    <Card className="absolute bottom-4 left-1/2 -translate-x-1/2 w-80 bg-background/80 backdrop-blur-sm z-20">
-      <CardHeader className="p-4">
-        <div className="flex justify-between items-start">
-          <div>
-            <CardTitle className="text-lg">
-              {towerDefinition.name} - Nivel {selectedTower.level}
-            </CardTitle>
-            <p className="text-sm text-muted-foreground">
-              Daño: {towerDefinition.levels[selectedTower.level - 1]?.damage} |
-              Rango: {towerDefinition.levels[selectedTower.level - 1]?.range}
-            </p>
-          </div>
-          <Button variant="ghost" size="sm" onClick={handleClose}>
-            X
-          </Button>
+    <div className="h-full w-full flex items-center justify-between p-2 gap-4 animate-fade-in">
+      {/* Tower Info */}
+      <div className="flex items-center gap-3 text-white">
+        <Info className="h-8 w-8 text-blue-400 flex-shrink-0" />
+        <div>
+          <h3 className="font-bold text-lg leading-tight">
+            {towerDefinition.name}
+          </h3>
+          <p className="text-sm text-gray-300 leading-tight">
+            Nivel: {selectedTower.level}
+            {nextLevelData ? ` -> ${selectedTower.level + 1}` : " (Max)"}
+          </p>
         </div>
-      </CardHeader>
-      <CardContent className="p-4 pt-0">
-        <div className="flex justify-between gap-2">
-          {nextLevelData ? (
-            <Button
-              className="flex-1"
-              onClick={handleUpgrade}
-              disabled={player.gold < nextLevelData.cost}
-            >
-              <ChevronsUp className="mr-2 h-4 w-4" /> Mejorar (
-              {nextLevelData.cost}
-              <DollarSign className="ml-1 h-3 w-3" />)
-            </Button>
-          ) : (
-            <Button className="flex-1" disabled>
-              Nivel Máximo
-            </Button>
-          )}
+      </div>
 
-          <Button variant="destructive" className="flex-1" onClick={handleSell}>
-            <Trash2 className="mr-2 h-4 w-4" /> Vender
+      {/* Action Buttons */}
+      <div className="flex items-center gap-2">
+        {nextLevelData ? (
+          <Button
+            size="lg"
+            className="bg-green-600 hover:bg-green-700 text-white flex-1"
+            onClick={handleUpgrade}
+            disabled={player.gold < nextLevelData.cost}
+          >
+            <ChevronsUp className="mr-2 h-5 w-5" /> Mejorar (
+            {nextLevelData.cost}
+            <DollarSign className="ml-1 h-4 w-4" />)
           </Button>
-        </div>
-        {nextLevelData && (
-          <div className="text-xs text-muted-foreground mt-2">
-            <p>
-              Próximo nivel: Daño {nextLevelData.damage}, Rango{" "}
-              {nextLevelData.range}
-            </p>
-          </div>
+        ) : (
+          <Button size="lg" className="flex-1" disabled>
+            Nivel Máximo
+          </Button>
         )}
-      </CardContent>
-    </Card>
+
+        <Button
+          size="lg"
+          variant="destructive"
+          className="bg-red-700 hover:bg-red-800 text-white flex-1"
+          onClick={handleSell}
+        >
+          <Trash2 className="mr-2 h-5 w-5" /> Vender
+        </Button>
+
+        <Button
+          size="icon"
+          variant="ghost"
+          onClick={() => selectTower(null)}
+          className="text-gray-400 hover:text-white hover:bg-gray-700"
+        >
+          <X className="h-6 w-6" />
+        </Button>
+      </div>
+    </div>
   );
 }

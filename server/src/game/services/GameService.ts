@@ -40,7 +40,19 @@ class GameSessionManager {
    * @returns La instancia de la sesión o undefined si no se encuentra.
    */
   public findSession(sessionId: string): GameSession | undefined {
-    return this.sessions.get(sessionId);
+    // Búsqueda directa
+    const directHit = this.sessions.get(sessionId);
+    if (directHit) return directHit;
+
+    // Si no se encuentra, y el ID no tiene prefijo, intenta añadirlo
+    // para solucionar el problema del cliente que trunca el ID.
+    if (!sessionId.startsWith("game_")) {
+      const prefixedId = `game_${sessionId}`;
+      const prefixedHit = this.sessions.get(prefixedId);
+      if (prefixedHit) return prefixedHit;
+    }
+
+    return undefined;
   }
 
   /**

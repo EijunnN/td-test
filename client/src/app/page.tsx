@@ -8,6 +8,7 @@ import type {
   S2C_GameJoinedPayload,
   S2C_ErrorMessagePayload,
 } from "@shared/types/events";
+import { Castle, Play, LogIn } from "lucide-react";
 
 type ConnectionStatus = "disconnected" | "connecting" | "connected" | "error";
 
@@ -28,6 +29,7 @@ export default function Home() {
     const handleError = (payload: S2C_ErrorMessagePayload) => {
       // TODO: Usar un sistema de notificaciones más robusto (como react-toastify)
       alert(`Error del servidor: ${payload.message}`);
+      setStatus("error");
     };
 
     const handleGameJoined = (payload: S2C_GameJoinedPayload) => {
@@ -82,71 +84,71 @@ export default function Home() {
     }
   };
 
-  const renderContent = () => {
-    // Si ya estamos en una partida, mostrar la vista del juego
-    if (gameState) {
-      return <GameView />;
-    }
+  // Si ya estamos en una partida, mostrar la vista del juego a pantalla completa
+  if (gameState) {
+    return <GameView />;
+  }
 
-    // Si no, mostrar el lobby para crear/unirse
-    return (
-      <div className="flex flex-col gap-6 items-center justify-center flex-grow p-6">
-        <h2 className="text-3xl font-bold mb-4">Tower Defense</h2>
-        <input
-          type="text"
-          placeholder="Tu nick"
-          value={nick}
-          onChange={(e) => setNick(e.target.value)}
-          className="w-full max-w-sm p-3 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
-        />
+  // Si no, mostrar el lobby para crear/unirse
+  return (
+    <main className="flex min-h-screen w-screen flex-col items-center justify-center p-4 bg-gradient-to-br from-gray-900 to-slate-800 text-white font-sans">
+      <div className="w-full max-w-md mx-auto bg-slate-900/50 backdrop-blur-sm rounded-2xl p-8 shadow-2xl border border-slate-700">
+        <div className="flex flex-col items-center justify-center text-center mb-8">
+          <Castle className="h-16 w-16 text-blue-400 mb-4" />
+          <h1 className="text-5xl font-extrabold text-white">Tower Defense</h1>
+          <p className="text-slate-400 mt-2">
+            Crea una partida o únete a una existente.
+          </p>
+        </div>
 
-        <div className="w-full max-w-sm flex flex-col gap-4">
+        <div className="flex flex-col gap-6">
+          <input
+            type="text"
+            placeholder="Tu nick"
+            value={nick}
+            onChange={(e) => setNick(e.target.value)}
+            className="w-full p-4 rounded-lg bg-slate-800 border-2 border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition text-lg font-mono"
+          />
+
           <button
             onClick={handleCreateGame}
             disabled={status === "connecting"}
-            className="w-full px-8 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold transition-transform transform hover:scale-105 disabled:bg-gray-500"
+            className="w-full flex items-center justify-center gap-3 px-8 py-4 bg-blue-600 hover:bg-blue-700 rounded-lg text-xl font-bold transition-transform transform hover:scale-105 disabled:bg-slate-600 disabled:cursor-not-allowed"
           >
+            <Play className="h-6 w-6" />
             {status === "connecting" ? "Conectando..." : "Crear Partida"}
           </button>
-          <div className="flex items-center gap-2">
+
+          <div className="flex items-center gap-2 text-slate-400">
+            <hr className="w-full border-slate-700" />
+            <span className="text-sm">O</span>
+            <hr className="w-full border-slate-700" />
+          </div>
+
+          <div className="flex flex-col items-stretch gap-3">
             <input
               type="text"
               placeholder="ID de Sala"
               value={roomId}
               onChange={(e) => setRoomId(e.target.value)}
-              className="flex-grow p-3 rounded bg-gray-700 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition"
+              className="p-4 rounded-lg bg-slate-800 border-2 border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition text-lg font-mono"
             />
             <button
               onClick={handleJoinGame}
               disabled={status === "connecting"}
-              className="px-6 py-3 bg-green-600 hover:bg-green-700 rounded-lg font-semibold transition-transform transform hover:scale-105 disabled:bg-gray-500"
+              className="px-6 py-4 flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 rounded-lg font-bold transition-transform transform hover:scale-105 disabled:bg-slate-600 disabled:cursor-not-allowed"
             >
+              <LogIn className="h-5 w-5" />
               Unirse
             </button>
           </div>
         </div>
 
         {status === "error" && (
-          <p className="text-red-500 mt-2">
-            No se pudo conectar o unir a la partida.
+          <p className="text-red-500 mt-4 text-center">
+            No se pudo conectar. Inténtalo de nuevo.
           </p>
         )}
-      </div>
-    );
-  };
-
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-4 md:p-8 bg-gray-900 text-white font-sans">
-      <div
-        className="w-full max-w-4xl bg-gray-800 rounded-lg shadow-xl flex flex-col"
-        style={{ height: "90vh" }}
-      >
-        <header className="p-4 border-b border-gray-700">
-          <h1 className="text-2xl font-bold text-center text-blue-400">
-            Tower Defense
-          </h1>
-        </header>
-        <div className="flex-grow overflow-auto flex">{renderContent()}</div>
       </div>
     </main>
   );

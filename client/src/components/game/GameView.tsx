@@ -17,11 +17,14 @@ import { TowerShop } from "./TowerShop";
 import { ChatBox } from "./ChatBox";
 import { TowerControl } from "./TowerControl";
 import { EndScreen } from "./EndScreen";
+import { TowerQuickBar } from "./TowerQuickBar";
 
 const GameView = () => {
   const {
     gameState,
     isHost,
+    selectedTowerId,
+    towerToBuild,
     handleTowerPlaced,
     handlePlayerStateUpdate,
     setGameOver,
@@ -95,46 +98,65 @@ const GameView = () => {
 
   if (!gameState) {
     return (
-      <div className="flex items-center justify-center h-full">
+      <div className="flex items-center justify-center h-full text-white bg-gray-900">
         Cargando partida...
       </div>
     );
   }
 
-  return (
-    <div className="flex flex-col h-screen w-screen bg-gray-900 text-white overflow-hidden">
-      <div className="flex-grow relative">
-        <HUD />
-        <div className="absolute inset-0 flex items-center justify-center">
-          <GameCanvas />
+  const renderGameFooter = () => {
+    if (gameState.status === "finished") {
+      return null;
+    }
+
+    // Durante el lobby, el host ve el botón de empezar y todos tienen acceso a la tienda completa (Drawer).
+    if (gameState.status === "lobby") {
+      return (
+        <div className="w-full h-full flex items-center justify-between gap-4">
+          <div className="flex-grow">
+            <TowerShop />
+          </div>
+          {isHost && (
+            <div className="flex-shrink-0 pr-4">
+              <button
+                onClick={handleStartGame}
+                className="px-6 py-4 bg-green-600 hover:bg-green-700 rounded-lg font-bold text-lg transition-transform transform hover:scale-105 shadow-lg"
+              >
+                Iniciar
+              </button>
+            </div>
+          )}
         </div>
-        <TowerControl />
+      );
+    }
+
+    // En partida, se muestra la barra rápida o los controles de torre.
+    if (gameState.status === "in_progress") {
+      const showTowerControls = selectedTowerId && !towerToBuild;
+      return showTowerControls ? <TowerControl /> : <TowerQuickBar />;
+    }
+    return null;
+  };
+
+  return (
+    <div className="flex flex-col h-screen w-screen bg-gray-800 text-white overflow-hidden">
+      <main className="flex-grow relative">
+        <GameCanvas />
+        <HUD />
         <ChatBox />
         <EndScreen />
-        <div className="absolute bottom-24 md:bottom-2 left-2 p-2 bg-black bg-opacity-50 rounded max-h-40 overflow-y-auto text-sm font-mono">
+
+        {/* System Messages Log */}
+        <div className="absolute bottom-4 left-4 p-2 bg-black bg-opacity-50 rounded max-h-40 w-1/3 max-w-sm overflow-y-auto text-sm font-mono pointer-events-none">
           {systemMessages.map((msg, index) => (
             <div key={index}>{msg}</div>
           ))}
         </div>
-      </div>
+      </main>
 
-      <div className="flex-shrink-0 p-2 bg-gray-800 border-t border-gray-700">
-        {gameState.status === "lobby" && isHost && (
-          <div className="flex justify-center items-center h-full">
-            <button
-              onClick={handleStartGame}
-              className="px-8 py-3 bg-green-600 hover:bg-green-700 rounded-lg font-semibold transition-transform transform hover:scale-105"
-            >
-              Empezar Partida
-            </button>
-          </div>
-        )}
-        {gameState.status === "in_progress" && (
-          <div className="w-full">
-            <TowerShop />
-          </div>
-        )}
-      </div>
+      <footer className="flex-shrink-0 p-2 bg-gray-900/50 backdrop-blur-sm border-t border-gray-700 h-36">
+        {renderGameFooter()}
+      </footer>
     </div>
   );
 };
