@@ -10,6 +10,7 @@ import type {
   S2C_TowerPlacedPayload,
   S2C_PlayerStateUpdatePayload,
   S2C_ErrorMessagePayload,
+  S2C_ChatMessageReceivedPayload,
 } from "@shared/types/events";
 import HUD from "./HUD";
 import { TowerShop } from "./TowerShop";
@@ -25,6 +26,7 @@ const GameView = () => {
     handlePlayerStateUpdate,
     setGameOver,
     setGameState,
+    handleChatMessageReceived,
   } = useGameStore();
   const [systemMessages, setSystemMessages] = useState<string[]>([]);
 
@@ -56,6 +58,10 @@ const GameView = () => {
       setSystemMessages((prev) => [...prev, `Error: ${payload.message}`]);
     };
 
+    const handleChat = (payload: S2C_ChatMessageReceivedPayload) => {
+      handleChatMessageReceived(payload);
+    };
+
     websocketService.on("game_state_update", handleGameStateUpdate);
     websocketService.on("system_message", handleSystemMessage);
     websocketService.on("game_started", handleGameStarted);
@@ -63,6 +69,7 @@ const GameView = () => {
     websocketService.on("tower_placed", handleTowerPlacedEvent);
     websocketService.on("player_state_update", handlePlayerUpdate);
     websocketService.on("error_message", handleError);
+    websocketService.on("chat_message_received", handleChat);
 
     return () => {
       websocketService.off("game_state_update", handleGameStateUpdate);
@@ -72,8 +79,15 @@ const GameView = () => {
       websocketService.off("tower_placed", handleTowerPlacedEvent);
       websocketService.off("player_state_update", handlePlayerUpdate);
       websocketService.off("error_message", handleError);
+      websocketService.off("chat_message_received", handleChat);
     };
-  }, [handlePlayerStateUpdate, handleTowerPlaced, setGameOver, setGameState]);
+  }, [
+    handlePlayerStateUpdate,
+    handleTowerPlaced,
+    setGameOver,
+    setGameState,
+    handleChatMessageReceived,
+  ]);
 
   const handleStartGame = () => {
     websocketService.send("start_game", {});
