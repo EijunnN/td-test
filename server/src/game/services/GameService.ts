@@ -39,7 +39,10 @@ class GameSessionManager {
    * @param sessionId El ID de la sesión a buscar.
    * @returns La instancia de la sesión o undefined si no se encuentra.
    */
-  public findSession(sessionId: string): GameSession | undefined {
+  public findSession(sessionId: string | undefined): GameSession | undefined {
+    // Si sessionId es undefined, no hay sesión que buscar
+    if (!sessionId) return undefined;
+    
     // Búsqueda directa
     const directHit = this.sessions.get(sessionId);
     if (directHit) return directHit;
@@ -78,21 +81,36 @@ class GameSessionManager {
    * @returns La sesión si se unió con éxito, de lo contrario undefined.
    */
   public joinSession(
-    sessionId: string,
+    sessionId: string | undefined,
     player: PlayerConnection
   ): GameSession | undefined {
-    const session = this.findSession(sessionId);
-    if (session && session.canJoin()) {
+    if (!sessionId) {
       console.log(
-        `[GameSessionManager] Jugador ${player.data.nick} se une a la sesión existente ${session.id}.`
+        `[GameSessionManager] No se pudo unir a la sesión: sessionId es undefined.`
       );
-      session.addPlayer(player);
-      return session;
+      return undefined;
     }
+    
+    const session = this.findSession(sessionId);
+    if (!session) {
+      console.log(
+        `[GameSessionManager] No se encontró la sesión ${sessionId}.`
+      );
+      return undefined;
+    }
+    
+    if (!session.canJoin()) {
+      console.log(
+        `[GameSessionManager] Sesión ${sessionId} no permite unirse. Estado: ${session.getStatus()}, Jugadores: ${session.getPlayerCount()}/${session.getMapData()?.maxPlayers}`
+      );
+      return undefined;
+    }
+    
     console.log(
-      `[GameSessionManager] No se pudo unir a la sesión ${sessionId}. No encontrada o no disponible.`
+      `[GameSessionManager] Jugador ${player.data.nick} se une a la sesión existente ${session.id}.`
     );
-    return undefined;
+    session.addPlayer(player);
+    return session;
   }
 }
 

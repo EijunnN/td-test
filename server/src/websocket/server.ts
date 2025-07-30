@@ -11,6 +11,7 @@ await gameDataService.loadGameData();
 // Define la configuración del servidor WebSocket.
 const server = Bun.serve({
   port: 3001, // Usando el puerto 3001 para evitar conflictos con el servidor de desarrollo de Next.js (que suele ser 3000)
+  hostname: "::",
 
   fetch(req, server) {
     const url = new URL(req.url);
@@ -77,7 +78,7 @@ const server = Bun.serve({
     },
     close(ws: PlayerConnection) {
       console.log(`Conexión cerrada: ${ws.data.id} (${ws.data.nick})`);
-      const session = gameSessionManager.findSession(ws.data.gameSessionId!);
+      const session = gameSessionManager.findSession(ws.data.gameSessionId);
       if (session) {
         session.removePlayer(ws.data.id);
         // Si la sesión queda vacía, la eliminamos.

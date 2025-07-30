@@ -205,6 +205,10 @@ export class GameSession {
     return this.connections.size;
   }
 
+  public getStatus(): "lobby" | "in_progress" | "finished" {
+    return this.state.status;
+  }
+
   /**
    * Añade un nuevo monstruo al estado de la sesión.
    */

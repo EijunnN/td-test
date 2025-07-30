@@ -39,7 +39,13 @@ function handleJoinGame(
     };
     ws.send(JSON.stringify({ type: "game_joined", payload: response }));
   } else {
-    // TODO: Enviar mensaje de error al cliente
+    // Enviar mensaje de error al cliente
+    ws.send(JSON.stringify({ 
+      type: "error_message", 
+      payload: { 
+        message: `No se pudo unir a la sala ${payload.roomId}. La sala puede estar llena o no existir.` 
+      } 
+    }));
     console.error(
       `Jugador ${ws.data.nick} no pudo unirse a la sala ${payload.roomId}`
     );
@@ -50,7 +56,7 @@ function handleStartGame(
   ws: PlayerConnection,
   payload: C2S_Payload<"start_game">
 ) {
-  const session = gameSessionManager.findSession(ws.data.gameSessionId!);
+  const session = gameSessionManager.findSession(ws.data.gameSessionId);
   if (session) {
     session.startGame(ws.data.id);
   }
@@ -60,7 +66,7 @@ function handleBuildTower(
   ws: PlayerConnection,
   payload: C2S_BuildTowerPayload
 ) {
-  const session = gameSessionManager.findSession(ws.data.gameSessionId!);
+  const session = gameSessionManager.findSession(ws.data.gameSessionId);
   if (session) {
     session.buildTower(ws.data.id, payload.towerId, payload.position);
   }
@@ -70,14 +76,14 @@ function handleUpgradeTower(
   ws: PlayerConnection,
   payload: C2S_UpgradeTowerPayload
 ) {
-  const session = gameSessionManager.findSession(ws.data.gameSessionId!);
+  const session = gameSessionManager.findSession(ws.data.gameSessionId);
   if (session) {
     session.upgradeTower(ws.data.id, payload.towerInstanceId);
   }
 }
 
 function handleSellTower(ws: PlayerConnection, payload: C2S_SellTowerPayload) {
-  const session = gameSessionManager.findSession(ws.data.gameSessionId!);
+  const session = gameSessionManager.findSession(ws.data.gameSessionId);
   if (session) {
     session.sellTower(ws.data.id, payload.towerInstanceId);
   }
@@ -87,7 +93,7 @@ function handleSendChatMessage(
   ws: PlayerConnection,
   payload: C2S_SendChatMessagePayload
 ) {
-  const session = gameSessionManager.findSession(ws.data.gameSessionId!);
+  const session = gameSessionManager.findSession(ws.data.gameSessionId);
   if (session) {
     session.handleChatMessage(ws.data.id, payload.message);
   }
